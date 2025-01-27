@@ -3,6 +3,8 @@ import pikepdf as PDF_TK
 import shutil
 import zlib
 
+"""NB: PyPDF4 seems no longer maintained so the last added function, 'pdf_compressor' use pypdf.""" 
+import pypdf
 
 def mergeTwoPdf(input_filename1, input_filename2, output_filename):
 	# Open the files that have to be merged one by one
@@ -99,6 +101,17 @@ def removePages(input_filename, output_filename, page_ranges):
 	pdf.save(output_filename)
 
 
+def pdf_compressor(input_filename, output_filename, reduce_imq=True, im_quality_ratio=80):
+	writer = pypdf.PdfWriter(clone_from=input_filename)
+	for page in writer.pages:
+    		page.compress_content_streams()  
+	if reduce_imq:
+		for page in writer.pages:
+		    for img in page.images:
+		        img.replace(img.image, quality=im_quality_ratio)
+
+	with open(output_filename, "wb") as f:
+	    writer.write(f)
 
 
 def main():
